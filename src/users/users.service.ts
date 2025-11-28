@@ -37,14 +37,21 @@ export class UsersService {
   }
 
   updatePassword(id: string, userUpdateDto: UpdatePasswordDto): User {
-    const user = this.findById(id);
+    const index = users.findIndex((u) => u.id === id);
+    if (index === -1) {
+      throw new NotFoundException(`User with id ${id} not found`);
+    }
+    const user = users[index];
     if (user.password !== userUpdateDto.oldPassword) {
       throw new ForbiddenException('Access denied');
     }
-    user.updatedAt = Date.now();
-    user.version = user.version + 1;
-    user.password = userUpdateDto.newPassword;
-    return user;
+    users[index] = {
+      ...user,
+      password: userUpdateDto.newPassword,
+      updatedAt: Date.now(),
+      version: user.version + 1,
+    };
+    return users[index];
   }
 
   deleteUser(id: string): void {

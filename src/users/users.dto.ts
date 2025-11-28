@@ -1,19 +1,23 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 import { Exclude, Expose } from 'class-transformer';
 
 export class CreateUserDto {
   @IsString()
+  @IsNotEmpty()
   login: string;
 
   @IsString()
+  @IsNotEmpty()
   password: string;
 }
 
 export class UpdatePasswordDto {
   @IsString()
+  @IsNotEmpty()
   oldPassword: string;
 
   @IsString()
+  @IsNotEmpty()
   newPassword: string;
 }
 

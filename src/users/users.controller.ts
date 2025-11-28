@@ -40,12 +40,16 @@ export class UsersController {
     return plainToInstance(ResponseUserDto, this.usersService.createUser(dto));
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   updatePassword(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() dto: UpdatePasswordDto,
-  ) {
-    return this.usersService.updatePassword(id, dto);
+  ): ResponseUserDto {
+    return plainToInstance(
+      ResponseUserDto,
+      this.usersService.updatePassword(id, dto),
+    );
   }
 
   @Delete(':id')
