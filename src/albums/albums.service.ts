@@ -16,7 +16,7 @@ export class AlbumsService {
   findById(id: string): Album {
     const album: Album | undefined = albums.find((a) => a.id === id);
     if (!album) {
-      new NotFoundException(`Album '${id}' not found`);
+      throw new NotFoundException(`Album '${id}' not found`);
     }
     return album;
   }
@@ -31,9 +31,12 @@ export class AlbumsService {
   }
 
   updateAlbum(id: string, dto: AlbumDto): Album {
-    let album = this.findById(id);
-    album = { ...album, ...dto };
-    return album;
+    const index = albums.findIndex((a) => a.id === id);
+    if (index === -1) {
+      throw new NotFoundException(`Album '${id}' not found`);
+    }
+    albums[index] = { ...albums[index], ...dto };
+    return albums[index];
   }
 
   deleteAlbum(id: string): void {

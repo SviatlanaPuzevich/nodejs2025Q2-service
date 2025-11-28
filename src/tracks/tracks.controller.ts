@@ -22,7 +22,7 @@ export class TracksController {
     return this.trackService.findAll();
   }
 
-  @Get()
+  @Get(':id')
   getTrackById(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.trackService.findById(id);
   }
@@ -32,7 +32,7 @@ export class TracksController {
     return this.trackService.createTrack(dto);
   }
 
-  @Put()
+  @Put(':id')
   updateTrack(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() dto: TrackDto,
@@ -40,7 +40,7 @@ export class TracksController {
     return this.trackService.updateTrack(id, dto);
   }
 
-  @Delete()
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteTrack(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.trackService.deleteTrack(id);

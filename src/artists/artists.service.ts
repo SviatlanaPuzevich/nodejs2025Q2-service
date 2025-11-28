@@ -20,7 +20,7 @@ export class ArtistsService {
   findById(id: string): Artist {
     const artist: Artist | undefined = artists.find((a) => a.id === id);
     if (!artist) {
-      new NotFoundException(`Artist '${id}' not found`);
+      throw new NotFoundException(`Artist '${id}' not found`);
     }
     return artist;
   }
@@ -35,9 +35,12 @@ export class ArtistsService {
   }
 
   updateArtist(id: string, dto: UpdateArtistDto): Artist {
-    let artist: Artist = this.findById(id);
-    artist = { ...artist, ...dto };
-    return artist;
+    const index = artists.findIndex((a) => a.id === id);
+    if (index === -1) {
+      throw new NotFoundException(`Artist '${id}' not found`);
+    }
+    artists[index] = { ...artists[index], ...dto };
+    return artists[index];
   }
 
   deleteArtist(id: string) {

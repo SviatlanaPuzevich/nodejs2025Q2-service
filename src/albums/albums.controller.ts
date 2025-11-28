@@ -22,7 +22,7 @@ export class AlbumsController {
     return this.albumService.findAll();
   }
 
-  @Get()
+  @Get(':id')
   getArtistById(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.albumService.findById(id);
   }
@@ -32,7 +32,7 @@ export class AlbumsController {
     return this.albumService.createAlbum(dto);
   }
 
-  @Put()
+  @Put(':id')
   updateArtist(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() dto: AlbumDto,
@@ -40,7 +40,7 @@ export class AlbumsController {
     return this.albumService.updateAlbum(id, dto);
   }
 
-  @Delete()
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteArtist(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.albumService.deleteAlbum(id);
