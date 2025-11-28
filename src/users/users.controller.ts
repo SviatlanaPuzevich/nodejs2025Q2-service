@@ -24,7 +24,9 @@ export class UsersController {
   }
 
   @Get()
-  getUserById(@Param('id', new ParseUUIDPipe()) id: string): User {
+  getUserById(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): User {
     return this.usersService.findById(id);
   }
 
@@ -35,7 +37,7 @@ export class UsersController {
 
   @Put()
   updatePassword(
-    @Param('id', new ParseUUIDPipe()) id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() dto: UpdatePasswordDto,
   ) {
     return this.usersService.updatePassword(id, dto);
@@ -43,7 +45,7 @@ export class UsersController {
 
   @Delete()
   @HttpCode(HttpStatus.NO_CONTENT)
-  deleteUser(@Param('id', new ParseUUIDPipe()) id: string) {
+  deleteUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.usersService.deleteUser(id);
   }
 }

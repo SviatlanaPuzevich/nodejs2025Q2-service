@@ -13,12 +13,6 @@ export interface Artist {
   grammy: boolean;
 }
 
-export interface Artist {
-  id: string; // uuid v4
-  name: string;
-  grammy: boolean;
-}
-
 export interface Track {
   id: string; // uuid v4
   name: string;
@@ -39,10 +33,3 @@ export interface Favorites {
   albums: string[]; // favorite albums ids
   tracks: string[]; // favorite tracks ids
 }
-
-
-export const isUUID = (value: unknown): value is string =>
-  typeof value === 'string' &&
-  new RegExp(
-    '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
-  ).test(value);
