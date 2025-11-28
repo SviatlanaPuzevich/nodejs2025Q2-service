@@ -1,4 +1,4 @@
-import { IsInt, IsString, IsUUID } from 'class-validator';
+import { IsInt, IsOptional, IsString, IsUUID, ValidateIf } from "class-validator";
 
 export interface Track {
   id: string; // uuid v4
@@ -16,8 +16,12 @@ export class TrackDto {
   duration: number;
 
   @IsUUID()
-  artistId: string;
+  @ValidateIf((o) => o.artistId !== null)
+  @IsOptional()
+  artistId: string | null;
 
   @IsUUID()
-  albumId: string;
+  @ValidateIf((o) => o.albumId !== null)
+  @IsOptional()
+  albumId: string | null;
 }
