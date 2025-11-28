@@ -54,7 +54,7 @@ export class AlbumsService {
       const index = albums.findIndex((a) => a.id === id);
       if (index !== -1) {
         this.tracksService.deleteTracksByAlbumId(id);
-        albums.splice(index, 1);
+        albums[index] = { ...albums[index], artistId: null };
       }
     });
   }

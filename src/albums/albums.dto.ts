@@ -1,4 +1,10 @@
-import { IsInt, IsString, IsUUID } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsString,
+  IsUUID,
+  ValidateIf,
+} from 'class-validator';
 
 export class AlbumDto {
   @IsString()
@@ -8,5 +14,7 @@ export class AlbumDto {
   year: number;
 
   @IsUUID()
-  artistId: string;
+  @ValidateIf((o) => o.artistId !== null)
+  @IsOptional()
+  artistId: string | null;
 }
