@@ -55,11 +55,11 @@ export class TracksService {
   }
 
   deleteTracksByArtistId(artistId: string): void {
-    const ids = tracks.filter((t) => t.albumId !== artistId).map((t) => t.id);
+    const ids = tracks.filter((t) => t.artistId === artistId).map((t) => t.id);
     ids.forEach((id) => {
       const index = tracks.findIndex((t) => t.id == id);
       if (index !== -1) {
-        tracks.splice(index, 1);
+        tracks[index] = { ...tracks[index], artistId: null };
       }
     });
   }
