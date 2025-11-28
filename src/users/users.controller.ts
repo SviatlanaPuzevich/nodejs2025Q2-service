@@ -1,5 +1,6 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
   Get,
@@ -9,33 +10,37 @@ import {
   ParseUUIDPipe,
   Post,
   Put,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from '../types/types';
-import { CreateUserDto, UpdatePasswordDto } from './users.dto';
+import { CreateUserDto, ResponseUserDto, UpdatePasswordDto } from './users.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  getAllUsers(): User[] {
-    return this.usersService.findAll();
+  getAllUsers(): ResponseUserDto[] {
+    return plainToInstance(ResponseUserDto, this.usersService.findAll());
   }
 
-  @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
+  @Get(':id')
   getUserById(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-  ): User {
-    return this.usersService.findById(id);
+  ): ResponseUserDto {
+    return plainToInstance(ResponseUserDto, this.usersService.findById(id));
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  createUser(@Body() dto: CreateUserDto): User {
-    return this.usersService.createUser(dto);
+  createUser(@Body() dto: CreateUserDto): ResponseUserDto {
+    return plainToInstance(ResponseUserDto, this.usersService.createUser(dto));
   }
 
-  @Put()
+  @Put(':id')
   updatePassword(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() dto: UpdatePasswordDto,
@@ -43,7 +48,7 @@ export class UsersController {
     return this.usersService.updatePassword(id, dto);
   }
 
-  @Delete()
+  @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.usersService.deleteUser(id);
