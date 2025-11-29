@@ -1,23 +1,24 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { ArtistDto, Artist } from './artists.dto';
 import { randomUUID } from 'node:crypto';
-import { artists } from '../db/db';
 import { TracksService } from '../tracks/tracks.service';
 import { AlbumsService } from '../albums/albums.service';
+import { DB } from '../types/types';
 
 @Injectable()
 export class ArtistsService {
   constructor(
     private readonly tracksService: TracksService,
     private readonly albumService: AlbumsService,
+    @Inject('DB') private readonly db: DB,
   ) {}
 
   findAll(): Artist[] {
-    return artists;
+    return this.db.artists;
   }
 
   findById(id: string): Artist {
-    const artist: Artist | undefined = artists.find((a) => a.id === id);
+    const artist: Artist | undefined = this.db.artists.find((a) => a.id === id);
     if (!artist) {
       throw new NotFoundException(`Artist '${id}' not found`);
     }
@@ -29,26 +30,26 @@ export class ArtistsService {
       id: randomUUID(),
       ...dto,
     };
-    artists.push(artist);
+    this.db.artists.push(artist);
     return artist;
   }
 
   updateArtist(id: string, dto: ArtistDto): Artist {
-    const index = artists.findIndex((a) => a.id === id);
+    const index = this.db.artists.findIndex((a) => a.id === id);
     if (index === -1) {
       throw new NotFoundException(`Artist '${id}' not found`);
     }
-    artists[index] = { ...artists[index], ...dto };
-    return artists[index];
+    this.db.artists[index] = { ...this.db.artists[index], ...dto };
+    return this.db.artists[index];
   }
 
   deleteArtist(id: string) {
-    const index = artists.findIndex((a) => a.id == id);
+    const index = this.db.artists.findIndex((a) => a.id == id);
     if (index === -1) {
       throw new NotFoundException(`Artist '${id}' not found`);
     }
     this.albumService.deleteAlbumsByArtist(id);
     this.tracksService.deleteTracksByArtistId(id);
-    artists.splice(index, 1);
+    this.db.artists.splice(index, 1);
   }
 }

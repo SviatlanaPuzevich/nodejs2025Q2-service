@@ -1,20 +1,23 @@
 import {
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto, UpdatePasswordDto, ResponseUserDto } from './users.dto';
+import { CreateUserDto, ResponseUserDto, UpdatePasswordDto } from './users.dto';
 import { randomUUID } from 'node:crypto';
-import { users } from '../db/db';
+import { DB } from '../types/types';
 
 @Injectable()
 export class UsersService {
+  constructor(@Inject('DB') private readonly db: DB) {}
+
   findAll(): ResponseUserDto[] {
-    return users;
+    return this.db.users;
   }
 
   findById(id: string): ResponseUserDto {
-    const user = users.find((user) => user.id === id);
+    const user = this.db.users.find((user) => user.id === id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
@@ -31,7 +34,7 @@ export class UsersService {
       createdAt: now,
       updatedAt: now,
     };
-    users.push(user);
+    this.db.users.push(user);
     return user;
   }
 
@@ -39,28 +42,28 @@ export class UsersService {
     id: string,
     userUpdateDto: UpdatePasswordDto,
   ): ResponseUserDto {
-    const index = users.findIndex((u) => u.id === id);
+    const index = this.db.users.findIndex((u) => u.id === id);
     if (index === -1) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-    const user = users[index];
+    const user = this.db.users[index];
     if (user.password !== userUpdateDto.oldPassword) {
       throw new ForbiddenException('Access denied');
     }
-    users[index] = {
+    this.db.users[index] = {
       ...user,
       password: userUpdateDto.newPassword,
       updatedAt: Date.now(),
       version: user.version + 1,
     };
-    return users[index];
+    return this.db.users[index];
   }
 
   deleteUser(id: string): void {
-    const index = users.findIndex((user) => user.id === id);
+    const index = this.db.users.findIndex((user) => user.id === id);
     if (index === -1) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
-    users.splice(index, 1);
+    this.db.users.splice(index, 1);
   }
 }

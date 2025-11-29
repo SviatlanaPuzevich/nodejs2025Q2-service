@@ -1,19 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
 import { AlbumDto, Album } from './albums.dto';
-import { albums } from '../db/db';
 import { TracksService } from '../tracks/tracks.service';
+import { DB } from '../types/types';
 
 @Injectable()
 export class AlbumsService {
-  constructor(private readonly tracksService: TracksService) {}
+  constructor(
+    private readonly tracksService: TracksService,
+    @Inject('DB') private readonly db: DB,
+  ) {}
 
   findAll(): Album[] {
-    return albums;
+    return this.db.albums;
   }
 
   findById(id: string): Album {
-    const album: Album | undefined = albums.find((a) => a.id === id);
+    const album: Album | undefined = this.db.albums.find((a) => a.id === id);
     if (!album) {
       throw new NotFoundException(`Album '${id}' not found`);
     }
@@ -25,35 +28,37 @@ export class AlbumsService {
       id: randomUUID(),
       ...dto,
     };
-    albums.push(album);
+    this.db.albums.push(album);
     return album;
   }
 
   updateAlbum(id: string, dto: AlbumDto): Album {
-    const index = albums.findIndex((a) => a.id === id);
+    const index = this.db.albums.findIndex((a) => a.id === id);
     if (index === -1) {
       throw new NotFoundException(`Album '${id}' not found`);
     }
-    albums[index] = { ...albums[index], ...dto };
-    return albums[index];
+    this.db.albums[index] = { ...this.db.albums[index], ...dto };
+    return this.db.albums[index];
   }
 
   deleteAlbum(id: string): void {
-    const index = albums.findIndex((a) => a.id === id);
+    const index = this.db.albums.findIndex((a) => a.id === id);
     if (index == -1) {
       throw new NotFoundException(`Album '${id}' not found`);
     }
     this.tracksService.deleteTracksByAlbumId(id);
-    albums.splice(index, 1);
+    this.db.albums.splice(index, 1);
   }
 
   deleteAlbumsByArtist(artistId: string): void {
-    const ids = albums.filter((a) => a.artistId === artistId).map((a) => a.id);
+    const ids = this.db.albums
+      .filter((a) => a.artistId === artistId)
+      .map((a) => a.id);
     ids.forEach((id) => {
-      const index = albums.findIndex((a) => a.id === id);
+      const index = this.db.albums.findIndex((a) => a.id === id);
       if (index !== -1) {
         this.tracksService.deleteTracksByAlbumId(id);
-        albums[index] = { ...albums[index], artistId: null };
+        this.db.albums[index] = { ...this.db.albums[index], artistId: null };
       }
     });
   }

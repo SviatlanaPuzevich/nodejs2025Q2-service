@@ -33,3 +33,13 @@ export interface Favorites {
   albums: string[]; // favorite albums ids
   tracks: string[]; // favorite tracks ids
 }
+
+export interface DB {
+  users: User[];
+  artists: Artist[];
+  albums: Album[];
+  tracks: Track[];
+  favArtists: Set<string>;
+  favAlbums: Set<string>;
+  favTracks: Set<string>;
+}
