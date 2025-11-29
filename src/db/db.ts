@@ -185,3 +185,7 @@ export const tracks: Track[] = [
     duration: 232,
   },
 ];
+
+export const favArtists: Set<string> = new Set<string>();
+export const favAlbums: Set<string> = new Set<string>();
+export const favTracks: Set<string> = new Set<string>();

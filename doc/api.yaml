@@ -449,6 +449,147 @@ paths:
         '404':
           description: Track not found
       tags: *ref_3
+  /favs:
+    get:
+      operationId: FavoritesController_getAll
+      summary: Get all favorites
+      description: Gets all favorites movies, tracks and books
+      parameters: []
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesResponse'
+      tags: &ref_4
+        - Favorites
+  /favs/artist/{id}:
+    post:
+      operationId: FavoritesController_addArtistToFavotite
+      summary: Add artist to the favorites
+      description: Add artist to the favorites
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+          description: Artist ID (UUID v4)
+      responses:
+        '201':
+          description: Added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Artist'
+        '400':
+          description: Bad request. artistId is invalid (not uuid)
+        '422':
+          description: Artist with id doesn't exist
+      tags: *ref_4
+    delete:
+      operationId: FavoritesController_deleteArtist
+      summary: Delete artist from favorites
+      description: Delete artist from favorites
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted successfully
+        '400':
+          description: Bad. artistId is invalid (not uuid)
+        '404':
+          description: Artist was not found
+      tags: *ref_4
+  /favs/album/{id}:
+    post:
+      operationId: FavoritesController_addAlbumToFavorite
+      summary: Add album to the favorites
+      description: Add album to the favorites
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+          description: Album ID (UUID v4)
+      responses:
+        '201':
+          description: Added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Album'
+        '400':
+          description: Bad request. albumId is invalid (not uuid)
+        '422':
+          description: Album with id doesn't exist
+      tags: *ref_4
+    delete:
+      operationId: FavoritesController_deleteAlbum
+      summary: Delete album from favorites
+      description: Delete album from favorites
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted successfully
+        '400':
+          description: Bad. albumId is invalid (not uuid)
+        '404':
+          description: Album was not found
+      tags: *ref_4
+  /favs/track/{id}:
+    post:
+      operationId: FavoritesController_addTrackToFavorite
+      summary: Track album to the favorites
+      description: Track album to the favorites
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+          description: Track ID (UUID v4)
+      responses:
+        '201':
+          description: Added successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Album'
+        '400':
+          description: Bad request. trackId is invalid (not uuid)
+        '422':
+          description: Track with id doesn't exist
+      tags: *ref_4
+    delete:
+      operationId: FavoritesController_deleteTrack
+      summary: Delete track from favorites
+      description: Delete track from favorites
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deleted successfully
+        '400':
+          description: Bad. trackId is invalid (not uuid)
+        '404':
+          description: Track was not found
+      tags: *ref_4
 info:
   title: Home Library Service
   description: Home music library service
@@ -612,3 +753,6 @@ components:
         - duration
         - artistId
         - albumId
+    FavoritesResponse:
+      type: object
+      properties: {}

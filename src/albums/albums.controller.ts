@@ -19,7 +19,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Track } from '../tracks/tracks.dto';
 
 @ApiTags('Albums')
 @Controller('album')
