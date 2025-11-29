@@ -3,18 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { User } from '../types/types';
-import { CreateUserDto, UpdatePasswordDto } from './users.dto';
+import { CreateUserDto, UpdatePasswordDto, ResponseUserDto } from './users.dto';
 import { randomUUID } from 'node:crypto';
 import { users } from '../db/db';
 
 @Injectable()
 export class UsersService {
-  findAll(): User[] {
+  findAll(): ResponseUserDto[] {
     return users;
   }
 
-  findById(id: string): User {
+  findById(id: string): ResponseUserDto {
     const user = users.find((user) => user.id === id);
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
@@ -22,7 +21,7 @@ export class UsersService {
     return user;
   }
 
-  createUser(dto: CreateUserDto): User {
+  createUser(dto: CreateUserDto): ResponseUserDto {
     const now = Date.now();
     const user = {
       id: randomUUID(),
@@ -36,7 +35,10 @@ export class UsersService {
     return user;
   }
 
-  updatePassword(id: string, userUpdateDto: UpdatePasswordDto): User {
+  updatePassword(
+    id: string,
+    userUpdateDto: UpdatePasswordDto,
+  ): ResponseUserDto {
     const index = users.findIndex((u) => u.id === id);
     if (index === -1) {
       throw new NotFoundException(`User with id ${id} not found`);

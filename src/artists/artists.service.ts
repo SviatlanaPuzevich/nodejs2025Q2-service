@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Artist } from 'src/types/types';
-import { CreateArtistDto, UpdateArtistDto } from './artists.dto';
+import { ArtistDto, Artist } from './artists.dto';
 import { randomUUID } from 'node:crypto';
 import { artists } from '../db/db';
 import { TracksService } from '../tracks/tracks.service';
@@ -25,7 +24,7 @@ export class ArtistsService {
     return artist;
   }
 
-  createArtist(dto: CreateArtistDto): Artist {
+  createArtist(dto: ArtistDto): Artist {
     const artist: Artist = {
       id: randomUUID(),
       ...dto,
@@ -34,7 +33,7 @@ export class ArtistsService {
     return artist;
   }
 
-  updateArtist(id: string, dto: UpdateArtistDto): Artist {
+  updateArtist(id: string, dto: ArtistDto): Artist {
     const index = artists.findIndex((a) => a.id === id);
     if (index === -1) {
       throw new NotFoundException(`Artist '${id}' not found`);

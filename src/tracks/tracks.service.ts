@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Track } from '../types/types';
 import { randomUUID } from 'node:crypto';
-import { TrackDto } from './tracks.dto';
+import { TrackDto, Track } from './tracks.dto';
 import { tracks } from '../db/db';
 
 @Injectable()

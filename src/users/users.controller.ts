@@ -15,17 +15,55 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto, ResponseUserDto, UpdatePasswordDto } from './users.dto';
 import { plainToInstance } from 'class-transformer';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
+@ApiTags('Users')
 @Controller('user')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({ summary: 'Get all users', description: 'Gets all users' })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful operation',
+    type: ResponseUserDto,
+    isArray: true,
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   getAllUsers(): ResponseUserDto[] {
     return plainToInstance(ResponseUserDto, this.usersService.findAll());
   }
 
+  @ApiOperation({
+    summary: 'Get single user by id',
+    description: 'Get single user by id',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    schema: { type: 'string' },
+    description: 'User ID (UUID v4)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful operation',
+    type: ResponseUserDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request. userId is invalid (not uuid)',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
   getUserById(
@@ -34,12 +72,51 @@ export class UsersController {
     return plainToInstance(ResponseUserDto, this.usersService.findById(id));
   }
 
+  @ApiOperation({ summary: 'Create user', description: 'Creates a new user' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been created.',
+    type: ResponseUserDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request. body does not contain required fields',
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
   createUser(@Body() dto: CreateUserDto): ResponseUserDto {
     return plainToInstance(ResponseUserDto, this.usersService.createUser(dto));
   }
 
+  @ApiOperation({
+    summary: "Update a user's password",
+    description: "Updates a user's password by ID",
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    schema: { type: 'string' },
+    description: 'User ID (UUID v4)',
+  })
+  @ApiBody({ type: UpdatePasswordDto })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been updated',
+    type: ResponseUserDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request. userId is invalid (not uuid)',
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'oldPassword is wrong',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
   updatePassword(
@@ -52,6 +129,28 @@ export class UsersController {
     );
   }
 
+  @ApiOperation({
+    summary: 'Delete user',
+    description: 'Deletes user by ID',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    schema: { type: 'string' },
+    description: 'User ID (UUID v4)',
+  })
+  @ApiResponse({
+    status: 204,
+    description: 'The user has been deleted',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request. userId is invalid (not uuid)',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   deleteUser(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
