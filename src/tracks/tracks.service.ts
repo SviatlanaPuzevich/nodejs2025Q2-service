@@ -42,6 +42,9 @@ export class TracksService {
     if (index === -1) {
       throw new NotFoundException(`Track '${id}' not found`);
     }
+    if (this.db.favTracks.has(id)) {
+      this.db.favTracks.delete(id);
+    }
     this.db.tracks.splice(index, 1);
   }
 

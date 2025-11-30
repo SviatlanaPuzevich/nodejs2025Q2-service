@@ -47,6 +47,9 @@ export class AlbumsService {
       throw new NotFoundException(`Album '${id}' not found`);
     }
     this.tracksService.deleteTracksByAlbumId(id);
+    if (this.db.favAlbums.has(id)) {
+      this.db.favAlbums.delete(id);
+    }
     this.db.albums.splice(index, 1);
   }
 

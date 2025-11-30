@@ -39,6 +39,9 @@ export class ArtistsService {
     if (index === -1) {
       throw new NotFoundException(`Artist '${id}' not found`);
     }
+    if (this.db.favArtists.has(id)) {
+      this.db.favArtists.delete(id);
+    }
     this.db.artists[index] = { ...this.db.artists[index], ...dto };
     return this.db.artists[index];
   }
