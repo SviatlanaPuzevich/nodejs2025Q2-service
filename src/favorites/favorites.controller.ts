@@ -29,8 +29,8 @@ export class FavoritesController {
     type: FavoritesResponse,
   })
   @Get()
-  getAll(): FavoritesResponse {
-    return this.favoritesService.getAllFavorites();
+  async getAll(): Promise<FavoritesResponse> {
+    return await this.favoritesService.getAllFavorites();
   }
 
   @ApiOperation({
