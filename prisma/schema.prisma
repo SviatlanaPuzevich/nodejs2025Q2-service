@@ -11,7 +11,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -19,8 +18,8 @@ model User {
   login     String
   password  String
   version   Int      @default(1)
-  createdAt DateTime @db.Timestamp(3)
-  updatedAt DateTime @db.Timestamp(3)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 }
 
 model Artist {
@@ -37,7 +36,7 @@ model Album {
   name      String
   year      Int
   artist    Artist?        @relation(fields: [artistId], references: [id], onDelete: SetNull)
-  artistId  String?
+  artistId  String?        @db.Uuid
   tracks    Track[]
   favorites FavoriteAlbum?
 }
@@ -46,30 +45,30 @@ model Track {
   id        String         @id @default(uuid()) @db.Uuid
   name      String
   artist    Artist?        @relation(fields: [artistId], references: [id], onDelete: SetNull)
-  artistId  String?
+  artistId  String?        @db.Uuid
   album     Album?         @relation(fields: [albumId], references: [id], onDelete: SetNull)
-  albumId   String?
+  albumId   String?        @db.Uuid
   duration  Int
   favorites FavoriteTrack?
 }
 
 model FavoriteArtist {
   artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
-  artistId String @unique
+  artistId String @unique @db.Uuid
 
   @@map("favorite_artist")
 }
 
 model FavoriteAlbum {
   album   Album  @relation(fields: [albumId], references: [id], onDelete: Cascade)
-  albumId String @unique
+  albumId String @unique @db.Uuid
 
   @@map("favorite_album")
 }
 
 model FavoriteTrack {
   track   Track  @relation(fields: [trackId], references: [id], onDelete: Cascade)
-  trackId String @unique
+  trackId String @unique @db.Uuid
 
   @@map("favorite_track")
 }
