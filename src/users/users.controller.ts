@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, ResponseUserDto, UpdatePasswordDto } from './users.dto';
-import { plainToInstance } from 'class-transformer';
 import {
   ApiBody,
   ApiOperation,
@@ -37,8 +36,8 @@ export class UsersController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
-  getAllUsers(): ResponseUserDto[] {
-    return plainToInstance(ResponseUserDto, this.usersService.findAll());
+  async getAllUsers(): Promise<ResponseUserDto[]> {
+    return await this.usersService.findAll();
   }
 
   @ApiOperation({
@@ -66,10 +65,10 @@ export class UsersController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Get(':id')
-  getUserById(
+  async getUserById(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
-  ): ResponseUserDto {
-    return plainToInstance(ResponseUserDto, this.usersService.findById(id));
+  ): Promise<ResponseUserDto> {
+    return await this.usersService.findById(id);
   }
 
   @ApiOperation({ summary: 'Create user', description: 'Creates a new user' })
@@ -85,8 +84,8 @@ export class UsersController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Post()
-  createUser(@Body() dto: CreateUserDto): ResponseUserDto {
-    return plainToInstance(ResponseUserDto, this.usersService.createUser(dto));
+  async createUser(@Body() dto: CreateUserDto): Promise<ResponseUserDto> {
+    return await this.usersService.createUser(dto);
   }
 
   @ApiOperation({
@@ -119,14 +118,11 @@ export class UsersController {
   })
   @UseInterceptors(ClassSerializerInterceptor)
   @Put(':id')
-  updatePassword(
+  async updatePassword(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() dto: UpdatePasswordDto,
-  ): ResponseUserDto {
-    return plainToInstance(
-      ResponseUserDto,
-      this.usersService.updatePassword(id, dto),
-    );
+  ): Promise<ResponseUserDto> {
+    return await this.usersService.updatePassword(id, dto);
   }
 
   @ApiOperation({

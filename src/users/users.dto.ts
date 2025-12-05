@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -49,9 +49,11 @@ export class ResponseUserDto {
 
   @ApiProperty({ example: 1655000000 })
   @Expose()
+  @Transform(({ value }) => new Date(value).getTime())
   createdAt: number;
 
   @ApiProperty({ example: 1655000000 })
   @Expose()
+  @Transform(({ value }) => new Date(value).getTime())
   updatedAt: number;
 }
