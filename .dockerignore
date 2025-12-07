@@ -10,8 +10,11 @@ pnpm-debug.log
 dist
 build
 
-# Prisma client generated locally
+# Prisma client generated locally (will be generated in container)
 generated
+
+# Test files (except for dev build)
+test
 
 # Docker
 Dockerfile*

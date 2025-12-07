@@ -36,6 +36,8 @@ services:
       - "${PORT}:${PORT}"
     volumes:
       - ./src:/app/src
+      - ./test:/app/test
+      - ./prisma:/app/prisma
       - /app/node_modules
       - ./logs_volume:/app/logs
     depends_on:
