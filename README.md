@@ -37,6 +37,10 @@ From the **project root**, run:
 docker compose up --build
 
 ```
+for hot reload you can try to use 
+```
+docker compose up --watch
+```
 
 If you are running from another directory, use the -f flag to specify the path to the docker-compose.yml file:
 ```
