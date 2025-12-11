@@ -4,7 +4,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { writeFileSync } from 'node:fs';
 import { dump } from 'js-yaml';
-import 'dotenv/config';
 import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
