@@ -6,9 +6,11 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { compare, hash } from 'bcrypt';
-import { AuthDto } from './auth.dto';
+import { AuthDto, TokenDto } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { plainToInstance } from 'class-transformer';
+import { ResponseUserDto } from '../users/users.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +20,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async signIn(authDto: AuthDto): Promise<void> {
+  async signIn(authDto: AuthDto): Promise<ResponseUserDto> {
     const user = await this.prisma.user.findFirst({
       where: {
         login: authDto.login,
@@ -28,9 +30,9 @@ export class AuthService {
       throw new ConflictException(`User with login ${authDto.login} exists`);
     }
     const now = new Date();
-    const salt = this.configService.get<string>('CRYPT_SALT');
-    const hashPassword = await hash(authDto.password, salt);
-    await this.prisma.user.create({
+    const salt = this.configService.get<number>('CRYPT_SALT');
+    const hashPassword = await hash(authDto.password, Number(salt));
+    const createdUser = await this.prisma.user.create({
       data: {
         login: authDto.login,
         password: hashPassword,
@@ -38,9 +40,10 @@ export class AuthService {
         updatedAt: now,
       },
     });
+    return plainToInstance(ResponseUserDto, createdUser);
   }
 
-  async loginIn(authDto: AuthDto): Promise<string> {
+  async loginIn(authDto: AuthDto): Promise<TokenDto> {
     const user = await this.prisma.user.findFirst({
       where: {
         login: authDto.login,
@@ -51,11 +54,14 @@ export class AuthService {
         `User with login ${authDto.login} does not exist`,
       );
     }
-    const passwordIsCorrect = await compare(user.password, authDto.password);
-    if (passwordIsCorrect) {
+    const passwordIsCorrect = await compare(authDto.password, user.password);
+    if (!passwordIsCorrect) {
       throw new UnauthorizedException('Invalid password');
     }
     const payload = { userId: user.id, login: user.login };
-    return await this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtService.signAsync(payload);
+    return {
+      accessToken,
+    };
   }
 }

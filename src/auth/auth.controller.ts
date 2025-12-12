@@ -1,14 +1,9 @@
-import {
-  Body,
-  ClassSerializerInterceptor,
-  Controller,
-  Post,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto, ResponseUserDto } from '../users/users.dto';
 import { AuthService } from './auth.service';
-import { AuthDto } from './auth.dto';
+import { AuthDto, TokenDto } from './auth.dto';
+import { Public } from './decorators/public.decorator';
 
 @ApiTags('Signup')
 @Controller('auth')
@@ -30,9 +25,9 @@ export class AuthController {
     status: 409,
     description: 'Conflict. Login already exists',
   })
-  @UseInterceptors(ClassSerializerInterceptor)
-  @Post()
-  async signIn(@Body() dto: AuthDto): Promise<void> {
+  @Public()
+  @Post('signup')
+  async signIn(@Body() dto: AuthDto): Promise<ResponseUserDto> {
     return await this.authService.signIn(dto);
   }
 
@@ -49,8 +44,9 @@ export class AuthController {
     status: 403,
     description: 'Incorrect login or password',
   })
-  @Post()
-  async login(@Body() dto: AuthDto): Promise<string> {
+  @Public()
+  @Post('login')
+  async login(@Body() dto: AuthDto): Promise<TokenDto> {
     return await this.authService.loginIn(dto);
   }
 }
