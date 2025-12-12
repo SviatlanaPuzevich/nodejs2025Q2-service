@@ -10,9 +10,13 @@ export class AuthDto {
   @ApiProperty({ example: 'secret_password' })
   @IsString()
   @Length(3, 30)
-  @Matches(/^[a-zA-Z0-9]{3,30}$/, {
+  @Matches(/^[\S]{3,30}$/, {
     message:
       'Password must contain only letters and numbers and be 3-30 characters long',
   })
   password: string;
+}
+
+export class TokenDto {
+  accessToken: string;
 }
