@@ -1,22 +1,28 @@
 import {
   ConflictException,
+  ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { compare, hash } from 'bcrypt';
-import { AuthDto, TokenDto } from './auth.dto';
-import { JwtService } from '@nestjs/jwt';
+import { AuthDto, RefreshTokenDto, TokenDto } from './auth.dto';
 import { ConfigService } from '@nestjs/config';
 import { plainToInstance } from 'class-transformer';
 import { ResponseUserDto } from '../users/users.dto';
+import { JWT_ACCESS, JWT_REFRESH } from './constants';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
-    private jwtService: JwtService,
+    @Inject(JWT_ACCESS)
+    private readonly jwtAccessService: JwtService,
+    @Inject(JWT_REFRESH)
+    private readonly jwtRefreshService: JwtService,
     private configService: ConfigService,
   ) {}
 
@@ -59,9 +65,36 @@ export class AuthService {
       throw new UnauthorizedException('Invalid password');
     }
     const payload = { userId: user.id, login: user.login };
-    const accessToken = await this.jwtService.signAsync(payload);
+    const accessToken = await this.jwtAccessService.signAsync(payload);
+    const refreshToken = await this.jwtRefreshService.signAsync(payload);
     return {
       accessToken,
+      refreshToken,
     };
+  }
+
+  async refresh(dto: RefreshTokenDto): Promise<TokenDto> {
+    if (!dto || !dto.refreshToken) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+    try {
+      const { userId, login } = await this.jwtRefreshService.verifyAsync(
+        dto.refreshToken,
+      );
+      const accessToken = await this.jwtAccessService.signAsync({
+        userId,
+        login,
+      });
+      const updatedRefreshToken = await this.jwtRefreshService.signAsync({
+        userId,
+        login,
+      });
+      return {
+        accessToken,
+        refreshToken: updatedRefreshToken,
+      };
+    } catch (e) {
+      throw new ForbiddenException('Refresh token failed');
+    }
   }
 }

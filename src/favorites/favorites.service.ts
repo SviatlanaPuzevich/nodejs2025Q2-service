@@ -7,7 +7,7 @@ import { Artist } from '../artists/artists.dto';
 import { Album } from '../albums/albums.dto';
 import { Track } from '../tracks/tracks.dto';
 import { FavoritesResponse } from './favorites.dto';
-import { PrismaService } from '../prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class FavoritesService {
