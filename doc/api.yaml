@@ -633,6 +633,14 @@ paths:
         '403':
           description: Incorrect login or password
       tags: *ref_5
+  /auth/refresh:
+    post:
+      operationId: AuthController_refresh
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_5
 info:
   title: Home Library Service
   description: Home music library service
