@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto, ResponseUserDto } from '../users/users.dto';
 import { AuthService } from './auth.service';
@@ -48,5 +48,12 @@ export class AuthController {
   @Post('login')
   async login(@Body() dto: AuthDto): Promise<TokenDto> {
     return await this.authService.loginIn(dto);
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  async refresh(@Body() dto): Promise<TokenDto> {
+    return await this.authService.refresh(dto);
   }
 }
