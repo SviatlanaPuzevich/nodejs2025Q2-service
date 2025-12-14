@@ -1,9 +1,9 @@
-import { Injectable, LoggerService } from '@nestjs/common';
+import { Injectable, LoggerService, OnModuleDestroy } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'node:fs';
 
 @Injectable()
-export class FileLoggerService implements LoggerService {
+export class FileLoggerService implements LoggerService, OnModuleDestroy {
   private MAX_FILE_SIZE = 1024;
   private currentSize = 0;
   private stream: fs.WriteStream;
@@ -50,10 +50,20 @@ export class FileLoggerService implements LoggerService {
     this.write('DEBUG', message);
   }
 
+  verbose(message: string) {
+    this.write('VERBOSE', message);
+  }
+
   private setFileSize(): void {
     const maxSize = this.configService.get<number>('LOG_MAX_SIZE');
     if (maxSize) {
       this.MAX_FILE_SIZE = maxSize * 1024;
+    }
+  }
+
+  onModuleDestroy() {
+    if (this.stream) {
+      this.stream.end();
     }
   }
 }
