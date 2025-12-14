@@ -6,11 +6,14 @@ import * as fs from 'node:fs';
 export class FileLoggerService implements LoggerService, OnModuleDestroy {
   private MAX_FILE_SIZE = 1024;
   private currentSize = 0;
+  private errorCurrentSize = 0;
   private stream: fs.WriteStream;
+  private errorStream: fs.WriteStream;
 
   constructor(private configService: ConfigService) {
     this.setFileSize();
     this.createStream();
+    this.createErrorStream();
   }
 
   private createStream() {
@@ -19,15 +22,40 @@ export class FileLoggerService implements LoggerService, OnModuleDestroy {
     this.currentSize = 0;
   }
 
-  private write(level: string, message: any, trace?: string) {
+  private createErrorStream() {
+    const fileName = `app-errors-${Date.now()}.log`;
+    this.errorStream = fs.createWriteStream(fileName, { flags: 'a' });
+    this.errorCurrentSize = 0;
+  }
+
+  private write(
+    stream: fs.WriteStream,
+    sizeTracker: 'current' | 'error',
+    level: string,
+    message: any,
+    trace?: string,
+  ) {
     const line = this.formatLine(level, message, trace);
     const lineSize = Buffer.byteLength(line);
-    if (this.currentSize + lineSize >= this.MAX_FILE_SIZE) {
-      this.stream.end();
-      this.createStream();
+    const currentSize =
+      sizeTracker === 'current' ? this.currentSize : this.errorCurrentSize;
+
+    if (currentSize + lineSize >= this.MAX_FILE_SIZE) {
+      stream.end();
+      if (sizeTracker === 'current') {
+        this.createStream();
+      } else {
+        this.createErrorStream();
+      }
+      stream = sizeTracker === 'current' ? this.stream : this.errorStream;
     }
-    this.stream.write(line + '\n');
-    this.currentSize += lineSize;
+
+    stream.write(line + '\n');
+    if (sizeTracker === 'current') {
+      this.currentSize += lineSize;
+    } else {
+      this.errorCurrentSize += lineSize;
+    }
   }
 
   private formatLine(level: string, message: any, trace?: string) {
@@ -35,23 +63,23 @@ export class FileLoggerService implements LoggerService, OnModuleDestroy {
   }
 
   log(message: string) {
-    this.write('LOG', message);
+    this.write(this.stream, 'current', 'LOG', message);
   }
 
   error(message: string, trace?: string) {
-    this.write('ERROR', message, trace);
+    this.write(this.errorStream, 'error', 'ERROR', message, trace);
   }
 
   warn(message: string) {
-    this.write('WARN', message);
+    this.write(this.stream, 'current', 'WARN', message);
   }
 
   debug(message: string) {
-    this.write('DEBUG', message);
+    this.write(this.stream, 'current', 'DEBUG', message);
   }
 
   verbose(message: string) {
-    this.write('VERBOSE', message);
+    this.write(this.stream, 'current', 'VERBOSE', message);
   }
 
   private setFileSize(): void {
@@ -64,6 +92,9 @@ export class FileLoggerService implements LoggerService, OnModuleDestroy {
   onModuleDestroy() {
     if (this.stream) {
       this.stream.end();
+    }
+    if (this.errorStream) {
+      this.errorStream.end();
     }
   }
 }

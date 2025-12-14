@@ -11,20 +11,20 @@ import { ConfigService } from '@nestjs/config';
 export class LoggingService implements LoggerService {
   private logLevels: LogLevel[] = ['log', 'warn', 'error'];
   private loggers: LoggerService[] = [];
+  private level = 3;
 
   constructor(
     private configService: ConfigService,
     private readonly consoleLogger: ConsoleLogger,
     private readonly fileLogger: FileLoggerService,
   ) {
-    const levels = this.configService.get<string>('LOG_LEVELS');
+    this.level = this.configService.get<number>('LOG_LEVELS');
     this.setLogger(this.consoleLogger);
     this.setLogger(this.fileLogger);
-    this.setLogLevels(this.parseLevels(levels));
   }
 
   log(message: string) {
-    if (this.logLevels.includes('log')) {
+    if (this.level > 2) {
       for (const logger of this.loggers) {
         logger.log(message);
       }
@@ -32,7 +32,7 @@ export class LoggingService implements LoggerService {
   }
 
   error(message: string, trace?: any) {
-    if (this.logLevels.includes('error')) {
+    if (this.level > 0) {
       for (const logger of this.loggers) {
         logger.error(message, trace);
       }
@@ -40,7 +40,7 @@ export class LoggingService implements LoggerService {
   }
 
   warn(message: string) {
-    if (this.logLevels.includes('warn')) {
+    if (this.level > 1) {
       for (const logger of this.loggers) {
         logger.warn(message);
       }
@@ -48,7 +48,7 @@ export class LoggingService implements LoggerService {
   }
 
   debug(message: string) {
-    if (this.logLevels.includes('debug')) {
+    if (this.level > 3) {
       for (const logger of this.loggers) {
         logger.debug(message);
       }
@@ -56,7 +56,7 @@ export class LoggingService implements LoggerService {
   }
 
   verbose(message: string) {
-    if (this.logLevels.includes('verbose')) {
+    if (this.level > 4) {
       for (const logger of this.loggers) {
         logger.verbose(message);
       }
