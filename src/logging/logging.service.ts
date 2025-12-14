@@ -17,41 +17,64 @@ export class LoggingService implements LoggerService {
     private readonly consoleLogger: ConsoleLogger,
     private readonly fileLogger: FileLoggerService,
   ) {
-    this.loggers.push(consoleLogger);
-    this.loggers.push(fileLogger);
+    const levels = this.configService.get<string>('LOG_LEVELS');
+    this.setLogger(this.consoleLogger);
+    this.setLogger(this.fileLogger);
+    this.setLogLevels(this.parseLevels(levels));
   }
 
   log(message: string) {
-    for (const logger of this.loggers) {
-      logger.log(message);
+    if (this.logLevels.includes('log')) {
+      for (const logger of this.loggers) {
+        logger.log(message);
+      }
     }
   }
 
   error(message: string, trace?: any) {
-    for (const logger of this.loggers) {
-      logger.error(message, trace);
+    if (this.logLevels.includes('error')) {
+      for (const logger of this.loggers) {
+        logger.error(message, trace);
+      }
     }
   }
 
   warn(message: string) {
-    for (const logger of this.loggers) {
-      logger.warn(message);
+    if (this.logLevels.includes('warn')) {
+      for (const logger of this.loggers) {
+        logger.warn(message);
+      }
     }
   }
 
   debug(message: string) {
-    for (const logger of this.loggers) {
-      logger.debug(message);
+    if (this.logLevels.includes('debug')) {
+      for (const logger of this.loggers) {
+        logger.debug(message);
+      }
     }
   }
 
   verbose(message: string) {
-    for (const logger of this.loggers) {
-      logger.verbose(message);
+    if (this.logLevels.includes('verbose')) {
+      for (const logger of this.loggers) {
+        logger.verbose(message);
+      }
     }
   }
 
   setLogLevels?(levels: LogLevel[]) {
     this.logLevels = levels;
+  }
+
+  setLogger(logger: LoggerService) {
+    this.loggers.push(logger);
+  }
+
+  private parseLevels(levels: string): LogLevel[] {
+    return levels
+      .split(',')
+      .map((l) => l.trim())
+      .join('') as unknown as LogLevel[];
   }
 }
