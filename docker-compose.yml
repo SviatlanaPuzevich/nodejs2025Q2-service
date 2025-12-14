@@ -49,3 +49,7 @@ services:
 networks:
   home_network:
     driver: bridge
+
+volumes:
+  postgres_data:
+  logs_volume:
