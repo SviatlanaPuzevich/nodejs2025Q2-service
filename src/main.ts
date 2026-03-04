@@ -4,8 +4,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { writeFileSync } from 'node:fs';
 import { dump } from 'js-yaml';
-import 'dotenv/config';
 import { ConfigService } from '@nestjs/config';
+import { LoggingService } from './logging/logging.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,8 +27,23 @@ async function bootstrap() {
       transform: true,
     }),
   );
+
+  const logger = app.get(LoggingService);
+  app.useLogger(logger);
+  process.on('uncaughtException', (error) => {
+    logger.error('Uncaught exception', error.stack);
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', (reason: any) => {
+    logger.error(
+      'Unhandled promise rejection',
+      reason?.stack ?? String(reason),
+    );
+  });
+
   await app.listen(port, '0.0.0.0');
-  console.log(`Application is running on: http://0.0.0.0:${port}`);
+  logger.log(`Application is running on: http://0.0.0.0:${port}`);
 }
 
 bootstrap();

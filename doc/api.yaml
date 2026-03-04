@@ -590,6 +590,57 @@ paths:
         '404':
           description: Track was not found
       tags: *ref_4
+  /auth/signup:
+    post:
+      operationId: AuthController_signIn
+      summary: Signup
+      description: Signup a user
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '204':
+          description: Successful signup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponseUserDto'
+        '400':
+          description: Bad request
+        '409':
+          description: Conflict. Login already exists
+      tags: &ref_5
+        - Signup
+  /auth/login:
+    post:
+      operationId: AuthController_login
+      summary: Login
+      description: Logins a user and returns a JWT-token
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '200':
+          description: Successful login
+        '403':
+          description: Incorrect login or password
+      tags: *ref_5
+  /auth/refresh:
+    post:
+      operationId: AuthController_refresh
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags: *ref_5
 info:
   title: Home Library Service
   description: Home music library service
