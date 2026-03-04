@@ -18,21 +18,58 @@ git clone {repository URL}
 npm install
 ```
 
-## Running application
+## Running application in Docker
 
-create `.env` file and add corresponding properties(see `env.example`)
+Create a `.env` file in the project root and set the following parameters(see `env.example`):
 
 ```
-npm start
+PORT=4000
+DATABASE_URL=postgresql://postgres_user:postgres_pass@postgres_db:5432/home_library_db
+
+POSTGRES_USER=postgres_user
+POSTGRES_PASSWORD=postgres_pass
+POSTGRES_DB=home_library_db
+
 ```
 
+From the **project root**, run:
+```
+docker compose up --build
+
+```
+for hot reload you can try to use 
+```
+docker compose up --watch
+```
+
+If you are running from another directory, use the -f flag to specify the path to the docker-compose.yml file:
+```
+docker compose -f /path/to/docker-compose.yml up --build
+
+```
+
+The application will be available locally at port from `.env` file
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
 
+## Optional: Stop Containers
+
+To stop the containers:
+
+```
+docker compose down
+```
+
+To remove volumes as well (clears database data):
+
+```
+docker compose down -v
+```
+
 ## Testing
 
-After application running open new terminal and enter:
+Tests can be run inside the container if dev dependencies are installed, or locally using
 
 To run all tests without authorization
 
@@ -73,3 +110,22 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+### Using Prebuilt Docker Image
+You can pull the prebuilt image with:
+
+```
+docker pull guzick/home_library_api:latest
+```
+
+**Note**: To run this image, you still need a PostgreSQL container and proper `DATABASE_URL` and `PORT` environment variables.
+
+### Notes for Windows Users
+
+Sometimes issues may occur with base images. If this happens, pull the base image manually:
+```
+docker pull node:24.11.1-alpine
+```
+
+
+Hot-reload is not fully supported on Windows. It is recommended to try hot-reload on Linux or macOS.

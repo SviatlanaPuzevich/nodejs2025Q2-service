@@ -1,0 +1,53 @@
+# Node
+node_modules
+npm-debug.log
+pnpm-debug.log
+.env
+.env.*
+
+
+# Build artifacts
+dist
+build
+
+# Prisma client generated locally (will be generated in container)
+generated
+
+# Test files (except for dev build)
+test
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# OS/System
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE / Editor
+.vscode
+.idea
+*.swp
+*.swo
+*.iml
+
+# Tests
+coverage
+nyc_output
+*.log
+
+# Cache files
+.cache
+.parcel-cache
+.next
+out
+
+#volumes
+postgres_data
+logs_volume
