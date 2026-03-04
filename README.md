@@ -6,6 +6,7 @@
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
 
 ## Downloading
+[repository](https://github.com/SviatlanaPuzevich/nodejs2025Q2-service)
 
 ```
 git clone {repository URL}
@@ -18,6 +19,8 @@ npm install
 ```
 
 ## Running application
+
+create `.env` file and add corresponding properties(see `env.example`)
 
 ```
 npm start
